@@ -1,20 +1,32 @@
-import { DataGrid, GridColDef, GridValueGetterParams } from '@material-ui/data-grid';
+import { useState } from 'react';
+import { DataGrid, GridColDef, GridValueGetterParams, GridSelectionModel } from '@material-ui/data-grid';
+import { server_calls } from '../../api';
+import { useGetData } from '../../custom-hooks';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle} from '@material-ui/core';
+import { DroneForm } from '../../components/DroneForm';
+
 
 const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    {
-    field: 'firstName',
-    headerName: 'First name',
+  { field: 'id', headerName: 'ID', width: 100 },
+  {
+    field: 'name',
+    headerName: 'name',
     width: 150
     },
     {
-    field: 'lastName',
-    headerName: 'Last name',
+      field: 'price',
+    headerName: 'price',
     width: 150
-    },
+  },
     {
-    field: 'age',
-    headerName: 'Age',
+    field: 'weight',
+    headerName: 'weight',
     type: 'number',
     width: 110
     },
@@ -29,25 +41,61 @@ const columns: GridColDef[] = [
         params.getValue(params.id, 'lastName') || ''
       }`,
     },
-];
-
-const rows = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
   ];
+  
+interface gridData{
+  data:{
+    id?:string;
+  }
+}
 
 export const DataTable = () =>{
+  let { droneData, getData } = useGetData();
+  let [open, setOpen] = useState(false);
+  let [gridData, setData] = useState<gridData>({data: {}})
+  const [selectionModel, setSelectionModel] = useState<any>([])
+
+  let handleOpen = () => {
+    setOpen(true)
+  }
+
+  let handleClose = () => {
+    setOpen(false)
+  }
+
+  let deleteData = () => {
+    server_calls.delete(selectionModel)
+    getData()
+    console.log('deleted selection!', selectionModel)
+  }
+
     return (
         <div style={{ height: 400, width: '100%' }}>
-            <h2>Characters in Inventory</h2>
-            <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
+          <h2> Drones in Inventory</h2>
+          <DataGrid 
+            rows={droneData} 
+            columns={columns} 
+            pageSize={5} 
+            checkboxSelection 
+            onSelectionModelChange ={ (item) => {
+              setSelectionModel(item)
+            }}
+            {...droneData}
+          />
+          <Button onClick={handleOpen}>Update</Button>
+          <Button variant="contained" color="secondary" onClick={deleteData}>Delete</Button>
+
+          <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">Update a Drone</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Drone id: {selectionModel}</DialogContentText>
+              <DroneForm id={`${selectionModel}`} />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="primary">Cancel</Button> 
+              <Button onClick={handleClose} color="primary">Done</Button> 
+            </DialogActions>
+          </Dialog>
         </div>
     )
 }
