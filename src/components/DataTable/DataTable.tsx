@@ -13,35 +13,60 @@ import { DroneForm } from '../../components/DroneForm';
 
 
 const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', width: 100 },
+  {
+    field: 'id',
+    headerName: 'ID',
+    width: 200
+  },
   {
     field: 'name',
     headerName: 'name',
     width: 150
-    },
-    {
-      field: 'price',
-    headerName: 'price',
+  },
+  {
+    field: 'description',
+    headerName: 'description',
     width: 150
   },
-    {
+  {
+    field: 'camera_quality',
+    headerName: 'camera_quality',
+    width: 200
+  },
+  {
+    field: 'flight_time',
+    headerName: 'flight_time',
+    width: 150
+  },
+  {
+    field: 'max_speed',
+    headerName: 'max_speed',
+    width: 150
+  },
+  {
+    field: 'dimensions',
+    headerName: 'dimensions',
+    width: 150
+  },
+  {
     field: 'weight',
     headerName: 'weight',
     type: 'number',
-    width: 110
-    },
-    {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params: GridValueGetterParams) =>
-      `${params.getValue(params.id, 'firstName') || ''} ${
-        params.getValue(params.id, 'lastName') || ''
-      }`,
-    },
-  ];
+    width: 200
+  },
+  {
+    field: 'cost_of_prod',
+    headerName: 'cost_of_prod',
+    type: 'number',
+    width: 210
+  },
+  {
+    field: 'series',
+    headerName: 'series',
+    type: 'number',
+    width: 210
+  }
+];
   
 interface gridData{
   data:{
@@ -63,8 +88,8 @@ export const DataTable = () =>{
     setOpen(false)
   }
 
-  let deleteData = () => {
-    server_calls.delete(selectionModel)
+  let deleteData = async () => {
+    await server_calls.delete(selectionModel)
     getData()
     console.log('deleted selection!', selectionModel)
   }
